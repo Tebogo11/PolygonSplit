@@ -18,7 +18,7 @@ function App() {
 
   //useState variables
   /**
-   * Holds the two points that create the line the user drawes.
+   * Holds the two points that create the line the user draws.
    * @type {object}
    */
   const [linePoints, setlinePoints] = useState({
@@ -33,13 +33,13 @@ function App() {
   const [dragging, setDragging] = useState(false);
 
   /**
-   * Holds stringfied array of the first polygons plot points.
+   * Holds stringfied array of the first polygon plot points.
    * @type {string}
    */
   const [firstPolygon, setFirstPolygon] = useState("");
 
   /**
-   * Holds stringfied array of the first polygons plot points.
+   * Holds stringfied array of the second polygon plot points.
    * @type {string}
    */
   const [secondPolygon, setSecondPolygon] = useState("");
@@ -51,7 +51,7 @@ function App() {
   const plotPoints = StringifyPoints(points);
 
   /**
-   * This function retrives the current clicked location and when clicked twice it
+   * This function retrives the current clicked location of the mouse and when clicked twice it
    * defines the line created by the user.
    * @param {event} evt Event listner
    * @returns {void}
@@ -61,16 +61,13 @@ function App() {
     var x = evt.pageX;
     //Collecting the y axis value
     var y = evt.pageY;
-    //This checks if the first coordinate has being state and if it has it will set the second coordinate
+    //This checks if the first coordinate has being set and if it has it will set the second coordinate
     //which finially creates a line
     if (linePoints.point1.x === null) {
       setlinePoints({ ...linePoints, point1: { x: x, y: y } });
     } else {
       setlinePoints({ ...linePoints, point2: { x: x, y: y } });
     }
-
-    console.log(linePoints.point1);
-    console.log(linePoints.point2);
   };
 
   /**
@@ -79,16 +76,17 @@ function App() {
    * @returns {void}
    */
   const loop = () => {
-    //This is the point points of the line created by the user
+    //This is the plot points of the line created by the user
     const x3 = linePoints.point1.x;
     const y3 = linePoints.point1.y;
     const x4 = linePoints.point2.x;
     const y4 = linePoints.point2.y;
 
-    //count to keep track of which plot point we are on
+    //this is a count to keep track of which second plot point we are on assessing in the forEach loop
+    //(x,y),(x[count],y[count]) = line
     let count = 1;
 
-    //this counts how many new plot points we have create by checking if they intersect
+    //this counts how many new plot points we have create by checking if they intersect.
     //max 2
     let newPlotCount = 0;
 
@@ -98,7 +96,7 @@ function App() {
     const secondPolygon = [];
 
     //ForEach loop to go through each line in the oringinally created shape
-    //and checks if the intersect. It then splits the lines that create the oringial shape in to two
+    //and checks if they intersect. It then splits the lines that create the oringial shape into two
     points.forEach((item) => {
       //Plot points of the current line we are checking for intersection
       let x1 = item.x;
@@ -109,18 +107,18 @@ function App() {
       //This functions returns a new plot point and stores it in a varible
       const cor = formaler(x1, y1, x2, y2, x3, y3, x4, y4);
 
-      //This if operation checks weather the polygon count has being set to one
-      //if it has has being, it stores the current plot point in to the first polygon array
+      //This 'if' operation checks weather the newplotcount has being set to one
+      //if it has has being, it stores the current plot point into the first polygon array
       if (newPlotCount === 1) {
         firstPolygon.push(item);
-      } // else it stores the values in the second polygon array if its below or over 1
+      } // else it stores the values in the second polygon array if the newplotcount is below or over 1
       else {
         secondPolygon.push(item);
       }
 
-      //This if functions checks weather the new plot point intersects with the current line of the shape
+      //This 'if' functions checks weather the created plot point intersects with the current line we are assessing
       //iF it does it stores the value in the first polygon array then the second polygon array,
-      //then raises the plot count by 1, so the foreach loop know weather to store data in the first polygon array
+      //then raises the newplotcount by 1, so then the foreach loop know weather to store data in the first polygon array
       //or second polygon array.
       if ((x1 < cor.pX && cor.pX < x2) || (y1 < cor.pY && cor.pY < y2)) {
         newPlotCount++;
@@ -131,25 +129,23 @@ function App() {
         firstPolygon.push({ x: cor.pX, y: cor.pY });
         secondPolygon.push({ x: cor.pX, y: cor.pY });
       }
-      //First polygon: This is created by the first new plot being called and stored and all
+      //First polygon: This is created by the first created plot being called and stored and all
       //the values that follow, before the second new plot point is called making the second new plot called, the end plot point of the shape
-
       //Second polygon: This is create by storing all the plot points called before the plot count changes to 1.
-      //then it stores the first new plot coordinate, then waits until the second new plot point is called before storing plots again.
-
+      //then it stores the first new plot coordinate, then waits until the second new plot point is called before storing the rest of the plot points.
       //This increase the count by 1 every iteration of the loop
       count++;
 
-      //If the count has reached max value it means we have reached the last plot point and need to measusre the line
+      //If the count has reached max value it means we have reached the last plot point of the shape and need to measusre the line
       //thats connected by the first plot point and the last plot point. Thats why count is set to 0 to represent the last plot point
       if (count === 7) {
         count = 0;
       }
     });
 
-    //Set the first polygon values as a string
+    //Set the first polygon array as a string
     setFirstPolygon(StringifyPoints(firstPolygon));
-    //Set the second polygon values as a string
+    //Set the second polygon array as a string
     setSecondPolygon(StringifyPoints(secondPolygon));
     //reset the line created by the user to null
     setlinePoints({
